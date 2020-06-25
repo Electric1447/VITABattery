@@ -6,12 +6,12 @@ A simple tai-hen plugin that displays the current battery percentage on your PS 
 Controls
 --------------------------------------------------------------------------------
 
-**Start + Up** -> Current battery percentage.
-**Start + Left** -> Current battery temperature in degrees C.
-**Start + Right** -> Battery life time.
+**Start + Up** -> Current battery percentage.  
+**Start + Left** -> Current battery temperature in degrees C.  
+**Start + Right** -> Battery life time.  
 
-**Start + Left Trigger** -> Cycle position.
-**Start + Right Trigger** -> Cycle text color.
+**Start + Left Trigger** -> Cycle position.  
+**Start + Right Trigger** -> Cycle text color.  
 
 **Start + Down** -> Close each of the above.
 
