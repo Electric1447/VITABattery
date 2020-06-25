@@ -1,0 +1,9 @@
+# Vita
+*.suprx
+*.skprx
+
+# Cmake
+/CMakeFiles
+Makefile
+CMakeCache.txt
+*.cmake
