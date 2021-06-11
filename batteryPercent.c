@@ -5,43 +5,68 @@
 #include "draw.h"
 
 
+#define TIMER_SECOND 	1000000 // 1 second
+
+
 int colors[] = {WHITE, GREEN, RED, BLUE, CYAN, MAGENTA, YELLOW, ORANGE, PURPLE};
 
-static SceUID g_hooks[5];
-int showMenu = 0;
-int posIndex = 0, colorIndex = 0;
+int menuIndex = 0, posIndex = 0, colorIndex = 0;
+static SceUInt64 tick = 0, t_tick = 0;
+static SceInt frames = 0, fps_data = 0;
 
 static uint32_t old_buttons, pressed_buttons;
 
-static tai_hook_ref_t ref_hook0, ref_hook1, ref_hook2, ref_hook3, ref_hook4;
+static SceUID tai_uid[5];
+static tai_hook_ref_t hook[5];
 
 
 int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
 	
 	drawSetFrameBuf(pParam);
 	
-	if (showMenu == 1) {
-		int percent = scePowerGetBatteryLifePercent();
-		drawSetColour(colors[colorIndex], BLACK);
-
-		drawStringf(((posIndex <= 1) ? ((percent == 100) ? 880 : 896) : 0), ((posIndex % 2 == 0) ? 0 : 528), "%d %%", percent);
-	}
-	else if (showMenu == 2) {
-		int batteryLifeTime = scePowerGetBatteryLifeTime();
-		drawSetColour(colors[colorIndex], BLACK);
+	drawSetColour(colors[colorIndex], BLACK);
 	
-		if (batteryLifeTime >= 0)
-			drawStringf(((posIndex <= 1) ? 848 : 0), ((posIndex % 2 == 0) ? 0 : 528), "%02ih %02im", batteryLifeTime / 60, batteryLifeTime - (batteryLifeTime / 60 * 60));
-	}
-	else if (showMenu == 3) {
-		int temp = scePowerGetBatteryTemp();
-		drawSetColour(colors[colorIndex], BLACK);
-		
-		if (scePowerGetBatteryTemp() > 0)
-			drawStringf(((posIndex <= 1) ? 800 : 0), ((posIndex % 2 == 0) ? 0 : 528), "Temp: %02i C", temp / 100);
+	switch (menuIndex) {
+		case 1: {
+			int percent = scePowerGetBatteryLifePercent();
+			
+			drawStringf(((posIndex <= 1) ? ((percent == 100) ? 880 : 896) : 0), ((posIndex % 2 == 0) ? 0 : 528), "%d %%", percent);
+			break;
+		}
+		case 2: {
+			int batteryLifeTime = scePowerGetBatteryLifeTime();
+			
+			if (batteryLifeTime >= 0)
+				drawStringf(((posIndex <= 1) ? 848 : 0), ((posIndex % 2 == 0) ? 0 : 528), "%02ih %02im", batteryLifeTime / 60, batteryLifeTime - (batteryLifeTime / 60 * 60));
+			break;
+		}
+		case 3: {
+			int temp = scePowerGetBatteryTemp();
+			
+			if (scePowerGetBatteryTemp() > 0)
+				drawStringf(((posIndex <= 1) ? 800 : 0), ((posIndex % 2 == 0) ? 0 : 528), "Temp: %02i C", temp / 100);
+			break;
+		}
+		case 4:
+			// This function is from Framecounter by Rinnegatamante.
+			t_tick = sceKernelGetProcessTimeWide();
+				
+			if (tick == 0) {
+				tick = t_tick;
+			} else {
+				if ((t_tick - tick) > TIMER_SECOND) {
+					fps_data = frames;
+					frames = 0;
+					tick = t_tick;
+				}
+				drawStringf(((posIndex <= 1) ? 848 : 0), ((posIndex % 2 == 0) ? 0 : 528), "FPS: %2d", fps_data);
+			}
+			
+			frames++;
+			break;
 	}
 	
-	return TAI_CONTINUE(int, ref_hook0, pParam, sync);
+	return TAI_CONTINUE(int, hook[0], pParam, sync);
 }   
 
 int checkButtons(int port, tai_hook_ref_t ref_hook, SceCtrlData *ctrl, int count) {
@@ -52,11 +77,11 @@ int checkButtons(int port, tai_hook_ref_t ref_hook, SceCtrlData *ctrl, int count
 	} else {
 		ret = TAI_CONTINUE(int, ref_hook, port, ctrl, count);
 
-		if (showMenu) {
+		if (menuIndex) {
 			pressed_buttons = ctrl->buttons & ~old_buttons;
 
 			if ((ctrl->buttons & SCE_CTRL_START) && (ctrl->buttons & SCE_CTRL_DOWN))
-				showMenu = 0;
+				menuIndex = 0;
 			else if ((ctrl->buttons & SCE_CTRL_START) && (pressed_buttons & SCE_CTRL_LTRIGGER))
 				posIndex = (posIndex + 1) % 4;
 			else if ((ctrl->buttons & SCE_CTRL_START) && (pressed_buttons & SCE_CTRL_RTRIGGER))
@@ -66,66 +91,43 @@ int checkButtons(int port, tai_hook_ref_t ref_hook, SceCtrlData *ctrl, int count
 		}
 		else {
 			if ((ctrl->buttons & SCE_CTRL_START) && (ctrl->buttons & SCE_CTRL_UP))
-				showMenu = 1;
+				menuIndex = 1;
 			else if ((ctrl->buttons & SCE_CTRL_START) && (ctrl->buttons & SCE_CTRL_RIGHT))
-				showMenu = 2;
+				menuIndex = 2;
 			else if ((ctrl->buttons & SCE_CTRL_START) && (ctrl->buttons & SCE_CTRL_LEFT))
-				showMenu = 3;
+				menuIndex = 3;
+			else if ((ctrl->buttons & SCE_CTRL_START) && (ctrl->buttons & SCE_CTRL_TRIANGLE))
+				menuIndex = 4;
 		}
 	}
   
 	return ret;
 }
 
-static int keys_patched1(int port, SceCtrlData *ctrl, int count) {
-	return checkButtons(port, ref_hook1, ctrl, count);
+static int sceCtrlPeekBufferPositive_patched(int port, SceCtrlData *ctrl, int count) {
+	return checkButtons(port, hook[1], ctrl, count);
 }   
 
-static int keys_patched2(int port, SceCtrlData *ctrl, int count) {
-	return checkButtons(port, ref_hook2, ctrl, count);
+static int sceCtrlPeekBufferPositive2_patched(int port, SceCtrlData *ctrl, int count) {
+	return checkButtons(port, hook[2], ctrl, count);
 }   
 
-static int keys_patched3(int port, SceCtrlData *ctrl, int count) {
-	return checkButtons(port, ref_hook3, ctrl, count);
+static int sceCtrlReadBufferPositive_patched(int port, SceCtrlData *ctrl, int count) {
+	return checkButtons(port, hook[3], ctrl, count);
 }   
 
-static int keys_patched4(int port, SceCtrlData *ctrl, int count) {
-	return checkButtons(port, ref_hook4, ctrl, count);
+static int sceCtrlReadBufferPositive2_patched(int port, SceCtrlData *ctrl, int count) {
+	return checkButtons(port, hook[4], ctrl, count);
 }   
 
 void _start() __attribute__ ((weak, alias ("module_start")));
-
 int module_start(SceSize argc, const void *args) {
 
-	g_hooks[0] = taiHookFunctionImport(&ref_hook0, 
-										TAI_MAIN_MODULE,
-										TAI_ANY_LIBRARY,
-										0x7A410B64, // sceDisplaySetFrameBuf
-										sceDisplaySetFrameBuf_patched);
-
-	g_hooks[1] = taiHookFunctionImport(&ref_hook1, 
-										TAI_MAIN_MODULE,
-										TAI_ANY_LIBRARY,
-										0xA9C3CED6, // sceCtrlPeekBufferPositive
-										keys_patched1);
-
-	g_hooks[2] = taiHookFunctionImport(&ref_hook2, 
-										TAI_MAIN_MODULE,
-										TAI_ANY_LIBRARY,
-										0x15F81E8C, // sceCtrlPeekBufferPositive2
-										keys_patched2);
-
-	g_hooks[3] = taiHookFunctionImport(&ref_hook3, 
-										TAI_MAIN_MODULE,
-										TAI_ANY_LIBRARY,
-										0x67E7AB83, // sceCtrlReadBufferPositive
-										keys_patched3);
-
-	g_hooks[4] = taiHookFunctionImport(&ref_hook4, 
-										TAI_MAIN_MODULE,
-										TAI_ANY_LIBRARY,
-										0xC4226A3E, // sceCtrlReadBufferPositive2
-										keys_patched4);
+	tai_uid[0] = taiHookFunctionImport(&hook[0], TAI_MAIN_MODULE, 0x4FAACD11, 0x7A410B64, sceDisplaySetFrameBuf_patched);
+	tai_uid[1] = taiHookFunctionImport(&hook[1], TAI_MAIN_MODULE, 0xD197E3C7, 0xA9C3CED6, sceCtrlPeekBufferPositive_patched);
+	tai_uid[2] = taiHookFunctionImport(&hook[2], TAI_MAIN_MODULE, 0xD197E3C7, 0x15F81E8C, sceCtrlPeekBufferPositive2_patched);
+	tai_uid[3] = taiHookFunctionImport(&hook[3], TAI_MAIN_MODULE, 0xD197E3C7, 0x67E7AB83, sceCtrlReadBufferPositive_patched);
+	tai_uid[4] = taiHookFunctionImport(&hook[4], TAI_MAIN_MODULE, 0xD197E3C7, 0xC4226A3E, sceCtrlReadBufferPositive2_patched);
 										
 	return SCE_KERNEL_START_SUCCESS;
 }
@@ -133,11 +135,9 @@ int module_start(SceSize argc, const void *args) {
 int module_stop(SceSize argc, const void *args) {
 	
 	// free hooks that didn't fail
-	if (g_hooks[0] >= 0) taiHookRelease(g_hooks[0], ref_hook0);
-	if (g_hooks[1] >= 0) taiHookRelease(g_hooks[1], ref_hook1);
-	if (g_hooks[2] >= 0) taiHookRelease(g_hooks[2], ref_hook2);
-	if (g_hooks[3] >= 0) taiHookRelease(g_hooks[3], ref_hook3);
-	if (g_hooks[4] >= 0) taiHookRelease(g_hooks[4], ref_hook4);
+	for (SceInt i = 0; i < 5; i++)
+		if (tai_uid[i] >= 0) 
+			taiHookRelease(tai_uid[i], hook[i]);
 	
 	return SCE_KERNEL_STOP_SUCCESS;
 }

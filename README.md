@@ -9,6 +9,7 @@ Controls
 **Start + Up** -> Current battery percentage.  
 **Start + Left** -> Current battery temperature in degrees C.  
 **Start + Right** -> Battery life time.  
+**Start + Triangle** -> FPS counter.  
 
 **Start + Left Trigger** -> Cycle position.  
 **Start + Right Trigger** -> Cycle text color.  
@@ -32,3 +33,4 @@ ux0:tai/vitabatteryplus.suprx
 
 ### Credits:
 - [joel16](https://github.com/joel16) for creating [VITABattery](https://github.com/joel16/VITABattery).
+- [Rinnegatamante](https://github.com/Rinnegatamante) for Framecounter function.
