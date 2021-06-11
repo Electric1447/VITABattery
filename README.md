@@ -3,16 +3,16 @@
 
 A simple tai-hen plugin that displays the current battery percentage on your PS VITA
 
-Controls
+Controls:
 --------------------------------------------------------------------------------
 
-**Start + Up** -> Current battery percentage.  
-**Start + Left** -> Current battery temperature in degrees C.  
-**Start + Right** -> Battery life time.  
-**Start + Triangle** -> FPS counter.  
+**Start + Up** -> Current battery percentage.
+**Start + Left** -> Current battery temperature in degrees C.
+**Start + Right** -> Battery life time.
+**Start + Triangle** -> FPS counter.
 
-**Start + Left Trigger** -> Cycle position.  
-**Start + Right Trigger** -> Cycle text color.  
+**Start + Left Trigger** -> Cycle position.
+**Start + Right Trigger** -> Cycle text color.
 
 **Start + Down** -> Close each of the above.
 
