@@ -28,7 +28,6 @@ endif()
 add_executable(vitabatteryplus
 	batteryPercent.c
 	draw.c
-	font.c
 )
 
 target_link_libraries(vitabatteryplus
@@ -36,6 +35,7 @@ target_link_libraries(vitabatteryplus
 	SceLibKernel_stub
 	SceIofilemgr_stub
 	SceDisplay_stub
+	SceCtrl_stub
 	k
 	gcc
 	ScePower_stub

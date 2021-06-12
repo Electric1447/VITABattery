@@ -11,7 +11,6 @@
  *
  * $Id: font.c 339 2005-06-27 02:24:25Z warren $
  */
-#include <psp2/types.h>
 
 const uint8_t msx[]=
 "\x00\x00\x00\x00\x00\x00\x00\x00\x3c\x42\xa5\x81\xa5\x99\x42\x3c"

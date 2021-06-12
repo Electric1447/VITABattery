@@ -1,8 +1,6 @@
 #ifndef __DRAW_H__
 #define __DRAW_H__
 
-#include <psp2/display.h>
-
 
 #define BLACK   0x00000000
 #define WHITE   0x00FFFFFF
@@ -15,40 +13,11 @@
 #define ORANGE  0x00008CFF
 #define PURPLE  0x00FC006D
 
-#define RGB(R, G, B)     (((B) << 16) | ((G) << 8) | (R))
-#define RGBT(R, G, B, T) (((T) << 24) | ((B) << 16) | ((G) << 8) | (R))
 
-#define CENTER(num) ((960 / 2)-(num*(16/2)))
+void updateFrameBuf(const SceDisplayFrameBuf *param);
+void setColor(int fg_col, int bg_col);
+void drawString(int sx, int sy, const char *format);
+void drawStringF(int sx, int sy, const char *format, ...);
 
-
-/*
-*	Sets up draw functions.
-*/
-int drawInit(void);
-
-/*
-*	This function sets the string colour, as well as the background colour.
-*/
-void drawSetColour(int fg_col, int bg_col);
-
-/*
-*	This function draws a string onto the screen.
-*/
-int drawString(int sx, int sy, const char *msg);
-
-/*
-*	This function draws a string onto the center of the screen.
-*/
-int drawStringCenter(int sy, const char *msg);
-
-/*
-*	This function draws a string onto the screen with string specifier formats.
-*/
-int drawStringf(int sx, int sy, const char *msg, ...);
-
-/*
-*	This function sets the frame buffer.
-*/
-int drawSetFrameBuf(const SceDisplayFrameBuf *param);
 
 #endif
