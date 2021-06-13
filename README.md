@@ -14,10 +14,10 @@ VITABatteryPlus Modes:
 Controls:
 --------------------------------------------------------------------------------
 
-**Start + Up** -> Cycle mode.
-**Start + Left** -> Cycle position.
-**Start + Right** -> Cycle text color.
-**Start + Down** -> Close VITABatteryPlus display.
+**Start + Up** -> Cycle mode.  
+**Start + Left** -> Cycle position.  
+**Start + Right** -> Cycle text color.  
+**Start + Down** -> Close VITABatteryPlus display.  
 
 
 Installation:
