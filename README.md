@@ -1,20 +1,23 @@
-# VITABatteryPlus
-[![Github latest downloads](https://img.shields.io/github/downloads/Electric1447/VITABatteryPlus/total.svg)](https://github.com/Electric1447/VITABatteryPlus/releases/latest)
+# VITABatteryPlus [![Github latest downloads](https://img.shields.io/github/downloads/Electric1447/VITABatteryPlus/total.svg)](https://github.com/Electric1447/VITABatteryPlus/releases/latest)
 
-A simple tai-hen plugin that displays the current battery percentage on your PS VITA
+A simple tai-hen plugin that displays the battery & framerate information on your PS VITA
+
+VITABatteryPlus Modes:
+--------------------------------------------------------------------------------
+
+- Current battery percentage.
+- Current battery temperature in Celsius (°C) degrees.
+- Remaining battery life time.
+- FPS counter.
+
 
 Controls:
 --------------------------------------------------------------------------------
 
-**Start + Up** -> Current battery percentage.
-**Start + Left** -> Current battery temperature in degrees C.
-**Start + Right** -> Battery life time.
-**Start + Triangle** -> FPS counter.
-
-**Start + Left Trigger** -> Cycle position.
-**Start + Right Trigger** -> Cycle text color.
-
-**Start + Down** -> Close each of the above.
+**Start + Up** -> Cycle mode.
+**Start + Left** -> Cycle position.
+**Start + Right** -> Cycle text color.
+**Start + Down** -> Close VITABatteryPlus display.
 
 
 Installation:

@@ -5,7 +5,10 @@
 #include "draw.h"
 
 
-#define TIMER_SECOND 	1000000 // 1 second
+#define TIMER_SECOND    1000000 // 1 second
+#define NUM_MODES       4
+#define NUM_POSITIONS   4
+#define NUM_COLORS      9
 
 
 int colors[] = {WHITE, GREEN, RED, BLUE, CYAN, MAGENTA, YELLOW, ORANGE, PURPLE};
@@ -23,29 +26,21 @@ static tai_hook_ref_t hook;
 void checkButtons() {
 	SceCtrlData pad;
 	sceCtrlPeekBufferPositive(0, &pad, 1);
+	pressed_buttons = pad.buttons & ~old_buttons;
+		
+	if ((pad.buttons & SCE_CTRL_START) && (pressed_buttons & SCE_CTRL_UP))
+		menuIndex = ((menuIndex == (NUM_MODES - 1)) ? NUM_MODES : ((menuIndex + 1) % NUM_MODES));
 		
 	if (menuIndex) {
-		pressed_buttons = pad.buttons & ~old_buttons;
-
 		if ((pad.buttons & SCE_CTRL_START) && (pad.buttons & SCE_CTRL_DOWN))
 			menuIndex = 0;
-		else if ((pad.buttons & SCE_CTRL_START) && (pressed_buttons & SCE_CTRL_LTRIGGER))
-			posIndex = (posIndex + 1) % 4;
-		else if ((pad.buttons & SCE_CTRL_START) && (pressed_buttons & SCE_CTRL_RTRIGGER))
-			colorIndex = (colorIndex + 1) % 9;
-
-		old_buttons = pad.buttons;
+		else if ((pad.buttons & SCE_CTRL_START) && (pressed_buttons & SCE_CTRL_LEFT))
+			posIndex = (posIndex + 1) % NUM_POSITIONS;
+		else if ((pad.buttons & SCE_CTRL_START) && (pressed_buttons & SCE_CTRL_RIGHT))
+			colorIndex = (colorIndex + 1) % NUM_COLORS;
 	}
-	else {
-		if ((pad.buttons & SCE_CTRL_START) && (pad.buttons & SCE_CTRL_UP))
-			menuIndex = 1;
-		else if ((pad.buttons & SCE_CTRL_START) && (pad.buttons & SCE_CTRL_RIGHT))
-			menuIndex = 2;
-		else if ((pad.buttons & SCE_CTRL_START) && (pad.buttons & SCE_CTRL_LEFT))
-			menuIndex = 3;
-		else if ((pad.buttons & SCE_CTRL_START) && (pad.buttons & SCE_CTRL_TRIANGLE))
-			menuIndex = 4;
-	}
+	
+	old_buttons = pad.buttons;
 }
 
 int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
